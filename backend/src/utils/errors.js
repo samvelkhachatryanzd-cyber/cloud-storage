@@ -30,4 +30,24 @@ class NotFoundError extends HttpError {
   }
 }
 
-module.exports = { HttpError, ValidationError, UnauthorizedError, ForbiddenError, NotFoundError };
+class UnsupportedMediaTypeError extends HttpError {
+  constructor(message = 'Unsupported media type') {
+    super(415, message);
+  }
+}
+
+class ServiceUnavailableError extends HttpError {
+  constructor(message = 'Service unavailable') {
+    super(503, message);
+  }
+}
+
+module.exports = {
+  HttpError,
+  ValidationError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  UnsupportedMediaTypeError,
+  ServiceUnavailableError,
+};
