@@ -2,6 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { api, apiJson } from './api.js';
 import { date, dateTime, fileSize, money } from './format.js';
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
+
+function fileProblem(file) {
+  if (file.size === 0) return 'The file is empty';
+  if (file.size > MAX_FILE_SIZE) return `The file is too large (maximum ${MAX_FILE_SIZE / 1024 / 1024} MB)`;
+  if (file.type && !ALLOWED_TYPES.includes(file.type)) return 'Only PNG, JPEG and PDF files are allowed';
+  return null;
+}
+
 export default function ClaimPage({ id, user, onBack }) {
   const [claim, setClaim] = useState(null);
   const [error, setError] = useState(null);
@@ -25,6 +35,19 @@ export default function ClaimPage({ id, user, onBack }) {
   }, [id]);
 
   useEffect(() => () => preview && URL.revokeObjectURL(preview.url), [preview]);
+
+  function selectFile(event) {
+    const selected = event.target.files[0] || null;
+    const problem = selected && fileProblem(selected);
+    if (problem) {
+      event.target.value = '';
+      setFile(null);
+      setUploadError(problem);
+      return;
+    }
+    setUploadError(null);
+    setFile(selected);
+  }
 
   async function upload(event) {
     event.preventDefault();
@@ -113,7 +136,7 @@ export default function ClaimPage({ id, user, onBack }) {
 
       {canUpload && (
         <form onSubmit={upload} className="upload">
-          <input ref={fileInput} type="file" onChange={(e) => setFile(e.target.files[0] || null)} />
+          <input ref={fileInput} type="file" accept={ALLOWED_TYPES.join(',')} onChange={selectFile} />
           <button type="submit" disabled={!file || uploading}>
             {uploading ? 'Uploading...' : 'Upload receipt'}
           </button>
