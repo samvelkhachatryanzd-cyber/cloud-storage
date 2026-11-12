@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'receipts',
       underscored: true,
       updatedAt: false,
-      defaultScope: { attributes: { exclude: ['data'] } },
+      defaultScope: { attributes: { exclude: ['data', 'objectKey'] } },
     }
   );
 
