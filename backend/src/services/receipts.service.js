@@ -33,8 +33,8 @@ async function getReceiptFile(user, id) {
   if (!receipt) throw new NotFoundError('Receipt not found');
   if (!canView(user, receipt.claim)) throw new ForbiddenError('You cannot open this receipt');
 
-  const body = receipt.objectKey ? await storage.getObjectStream(receipt.objectKey) : receipt.data;
-  if (!body) throw new NotFoundError('The receipt file is missing');
+  if (!receipt.objectKey) throw new NotFoundError('The receipt file is missing');
+  const body = await storage.getObjectStream(receipt.objectKey);
 
   return { fileName: receipt.fileName, contentType: receipt.contentType, sizeBytes: receipt.sizeBytes, body };
 }

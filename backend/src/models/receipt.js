@@ -9,13 +9,12 @@ module.exports = (sequelize, DataTypes) => {
       contentType: { type: DataTypes.STRING(100), allowNull: false },
       sizeBytes: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
       objectKey: { type: DataTypes.STRING(255), allowNull: true },
-      data: { type: DataTypes.BLOB('long'), allowNull: true },
     },
     {
       tableName: 'receipts',
       underscored: true,
       updatedAt: false,
-      defaultScope: { attributes: { exclude: ['data', 'objectKey'] } },
+      defaultScope: { attributes: { exclude: ['objectKey'] } },
     }
   );
 

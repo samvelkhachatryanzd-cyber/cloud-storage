@@ -25,8 +25,6 @@ async function download(req, res) {
   res.setHeader('Content-Disposition', contentDisposition(file.fileName));
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
-  if (Buffer.isBuffer(file.body)) return res.send(file.body);
-
   // The declared length makes a truncated stream fail in the client instead of looking like a complete file.
   res.setHeader('Content-Length', file.sizeBytes);
   try {

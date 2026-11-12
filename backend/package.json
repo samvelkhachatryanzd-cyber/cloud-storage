@@ -8,7 +8,10 @@
     "dev": "nodemon ./src/index.js",
     "db:migrate": "sequelize-cli db:migrate",
     "db:seed": "node ./scripts/seed.js",
-    "db:reset": "sequelize-cli db:migrate:undo:all && sequelize-cli db:migrate && node ./scripts/seed.js"
+    "db:reset": "sequelize-cli db:migrate:undo:all && sequelize-cli db:migrate && node ./scripts/seed.js",
+    "storage:backfill": "node ./scripts/storage-backfill.js",
+    "storage:verify": "node ./scripts/storage-verify.js",
+    "storage:clear": "node ./scripts/storage-clear.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
