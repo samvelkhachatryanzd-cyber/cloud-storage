@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       fileName: { type: DataTypes.STRING(255), allowNull: false },
       contentType: { type: DataTypes.STRING(100), allowNull: false },
       sizeBytes: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
-      data: { type: DataTypes.BLOB('long'), allowNull: false },
+      objectKey: { type: DataTypes.STRING(255), allowNull: true },
+      data: { type: DataTypes.BLOB('long'), allowNull: true },
     },
     {
       tableName: 'receipts',
