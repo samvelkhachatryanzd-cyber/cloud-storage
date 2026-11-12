@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { api, apiJson } from './api.js';
 import { date, dateTime, fileSize, money } from './format.js';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
+const MAX_FILE_SIZE = 64 * 1024 * 1024;
+const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
+const ACCEPT = [...ALLOWED_TYPES, '.heic', '.heif'].join(',');
+
+const isHeic = (contentType) => contentType === 'image/heic' || contentType === 'image/heif';
 
 function fileProblem(file) {
   if (file.size === 0) return 'The file is empty';
   if (file.size > MAX_FILE_SIZE) return `The file is too large (maximum ${MAX_FILE_SIZE / 1024 / 1024} MB)`;
-  if (file.type && !ALLOWED_TYPES.includes(file.type)) return 'Only PNG, JPEG and PDF files are allowed';
+  if (file.type && !ALLOWED_TYPES.includes(file.type)) return 'Only PNG, JPEG, WebP, HEIC and PDF files are allowed';
   return null;
 }
 
@@ -136,7 +139,7 @@ export default function ClaimPage({ id, user, onBack }) {
 
       {canUpload && (
         <form onSubmit={upload} className="upload">
-          <input ref={fileInput} type="file" accept={ALLOWED_TYPES.join(',')} onChange={selectFile} />
+          <input ref={fileInput} type="file" accept={ACCEPT} onChange={selectFile} />
           <button type="submit" disabled={!file || uploading}>
             {uploading ? 'Uploading...' : 'Upload receipt'}
           </button>
@@ -147,7 +150,14 @@ export default function ClaimPage({ id, user, onBack }) {
       {preview && (
         <section className="preview">
           <h3>{preview.receipt.fileName}</h3>
-          {preview.receipt.contentType.startsWith('image/') ? (
+          {isHeic(preview.receipt.contentType) ? (
+            <p>
+              Preview is not available for HEIC images.{' '}
+              <a href={preview.url} download={preview.receipt.fileName}>
+                Download the file
+              </a>
+            </p>
+          ) : preview.receipt.contentType.startsWith('image/') ? (
             <img src={preview.url} alt={preview.receipt.fileName} />
           ) : (
             <iframe src={preview.url} title={preview.receipt.fileName} />
