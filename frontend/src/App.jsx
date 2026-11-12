@@ -1,12 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { clearSession, getSession, saveSession } from './api.js';
 import ClaimPage from './ClaimPage.jsx';
 import ClaimsList from './ClaimsList.jsx';
 import Login from './Login.jsx';
+import { navigate, usePath } from './router.js';
+
+const CLAIMS_PATH = '/claims';
+const LOGIN_PATH = '/login';
+
+const isClaimsList = (path) => /^\/claims\/?$/.test(path);
+
+function claimIdFrom(path) {
+  const match = /^\/claims\/(\d+)\/?$/.exec(path);
+  return match ? Number(match[1]) : null;
+}
 
 export default function App() {
   const [session, setSession] = useState(getSession);
-  const [claimId, setClaimId] = useState(null);
+  const path = usePath();
+  const claimId = claimIdFrom(path);
+  const onClaims = claimId !== null || isClaimsList(path);
+
+  useEffect(() => {
+    if (session && !onClaims) navigate(CLAIMS_PATH, { replace: true });
+    if (!session && !onClaims && path !== LOGIN_PATH) navigate(LOGIN_PATH, { replace: true });
+  }, [session, onClaims, path]);
 
   function login(data) {
     saveSession(data);
@@ -16,10 +34,11 @@ export default function App() {
   function logout() {
     clearSession();
     setSession(null);
-    setClaimId(null);
+    navigate(LOGIN_PATH, { replace: true });
   }
 
   if (!session) return <Login onLogin={login} />;
+  if (!onClaims) return null;
 
   return (
     <main>
@@ -32,10 +51,10 @@ export default function App() {
           Log out
         </button>
       </header>
-      {claimId ? (
-        <ClaimPage id={claimId} user={session.user} onBack={() => setClaimId(null)} />
+      {claimId !== null ? (
+        <ClaimPage key={claimId} id={claimId} user={session.user} onBack={() => navigate(CLAIMS_PATH)} />
       ) : (
-        <ClaimsList user={session.user} onOpen={setClaimId} />
+        <ClaimsList user={session.user} onOpen={(id) => navigate(`${CLAIMS_PATH}/${id}`)} />
       )}
     </main>
   );
